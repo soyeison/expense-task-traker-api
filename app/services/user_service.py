@@ -7,8 +7,10 @@ from app.database.repositories.postgresql_user_repository import (
 )
 from app.schemas.base_schema import FormatResponseSchema
 from app.schemas.auth_schema import AuthSchemaBase, GetJWTAuthSchema
-from app.schemas.user_schema import UserCreateSchema
+from app.schemas.user_schema import UserCreateSchema, UserSchema
 from app.utils.auth.jwt import create_token
+from app.utils.auth.hash_password import hash_password
+from app.utils.auth.hash_password import verify_password
 
 
 class UserService:
@@ -29,10 +31,16 @@ class UserService:
 
             return jsonable_encoder(response_schema)
 
+        # Guardar el password encriptado
+        hashed_password = hash_password(payload.password)
+        setattr(payload, "password", hashed_password)
+
         user_created = self.user_repo.create(payload)
 
+        user_response_schema = UserSchema(**user_created.__dict__)
+
         response_schema = FormatResponseSchema(
-            data=jsonable_encoder(user_created),
+            data=jsonable_encoder(user_response_schema),
             message="Usuario registrado correctamente",
         )
 
@@ -49,8 +57,20 @@ class UserService:
                 message="El usuario no existe",
             )
 
-            repsonse_dict = jsonable_encoder(response_schema)
-            return JSONResponse(content=repsonse_dict)
+            return jsonable_encoder(response_schema)
+
+        if (
+            verify_password(
+                plain_passsword=payload.password, hashed_password=user.password
+            )
+            == False
+        ):
+            response_schema = FormatResponseSchema(
+                data=None,
+                message="El password es incorrecto",
+            )
+
+            return jsonable_encoder(response_schema)
 
         user_schema_response = GetJWTAuthSchema(
             user=jsonable_encoder(user),
