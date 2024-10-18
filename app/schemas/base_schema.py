@@ -3,5 +3,5 @@ from pydantic import BaseModel
 
 
 class FormatResponseSchema(BaseModel):
-    data: Union[str, List[Dict], Dict]
+    data: Union[str, List[Dict], Dict, None]
     message: str

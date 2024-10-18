@@ -5,6 +5,7 @@ class Settings(BaseSettings):
     app_name: str = "Awesome API"
     debug: bool = False
     database_url: str
+    jwt_private_key: str
 
     class ConfigDict:
         env_file = ".env"

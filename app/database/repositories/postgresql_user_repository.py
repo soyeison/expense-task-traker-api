@@ -17,3 +17,15 @@ class PostgreSqlUserRepository:
         self.db.refresh(db_user)
 
         return db_user
+
+    def get_user_by_id(self, user_id: int) -> UserModel:
+        db_user = self.db.query(UserModel).filter(UserModel.id == user_id).first()
+
+        return db_user
+
+    def get_user_by_username(self, username: str) -> UserModel:
+        db_user = (
+            self.db.query(UserModel).filter(UserModel.username == username).first()
+        )
+
+        return db_user
