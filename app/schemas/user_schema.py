@@ -5,6 +5,8 @@ from pydantic import BaseModel
 
 class UserSchemaBase(BaseModel):
     username: str
+    first_name: str
+    last_name: str
 
     class ConfigDict:
         orm_mode = True

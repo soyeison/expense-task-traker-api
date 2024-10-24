@@ -6,6 +6,7 @@ class Settings(BaseSettings):
     debug: bool = False
     database_url: str
     jwt_private_key: str
+    access_token_expire_minutes: int
 
     class ConfigDict:
         env_file = ".env"

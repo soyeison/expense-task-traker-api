@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
 from app.services.user_service import UserService
-from app.schemas.auth_schema import AuthSchemaBase
+from app.schemas.auth_schema import AuthSchemaBase, SignUpSchema
 from app.schemas.base_schema import FormatResponseSchema
 
 
@@ -15,7 +15,7 @@ class AuthController:
         self.router.post("/login", response_model=FormatResponseSchema)(self.login)
 
     async def sign_up(
-        self, payload: AuthSchemaBase, user_service: UserService = Depends(UserService)
+        self, payload: SignUpSchema, user_service: UserService = Depends(UserService)
     ):
         response = user_service.sign_up(payload)
 

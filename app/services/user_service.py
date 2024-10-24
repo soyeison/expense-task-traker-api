@@ -1,16 +1,17 @@
-import json
+from datetime import timedelta
 from fastapi.responses import JSONResponse
-from fastapi import Depends
+from fastapi import Depends, HTTPException
 from fastapi.encoders import jsonable_encoder
 from app.database.repositories.postgresql_user_repository import (
     PostgreSqlUserRepository,
 )
 from app.schemas.base_schema import FormatResponseSchema
-from app.schemas.auth_schema import AuthSchemaBase, GetJWTAuthSchema
-from app.schemas.user_schema import UserCreateSchema, UserSchema
+from app.schemas.auth_schema import AuthSchemaBase, GetJWTAuthSchema, SignUpSchema
+from app.schemas.user_schema import UserSchema
 from app.utils.auth.jwt import create_token
 from app.utils.auth.hash_password import hash_password
 from app.utils.auth.hash_password import verify_password
+from app.config import settings
 
 
 class UserService:
@@ -20,16 +21,11 @@ class UserService:
     ) -> None:
         self.user_repo = user_repository
 
-    def sign_up(self, payload: AuthSchemaBase):
+    def sign_up(self, payload: SignUpSchema):
         user = self.user_repo.get_user_by_username(username=payload.username)
 
         if user is not None:
-            response_schema = FormatResponseSchema(
-                data=None,
-                message="El usuario ya existe",
-            )
-
-            return jsonable_encoder(response_schema)
+            raise HTTPException(status_code=404, detail="El usuario ya existe")
 
         # Guardar el password encriptado
         hashed_password = hash_password(payload.password)
@@ -52,12 +48,7 @@ class UserService:
         user = self.user_repo.get_user_by_username(username=payload.username)
 
         if user is None:
-            response_schema = FormatResponseSchema(
-                data=None,
-                message="El usuario no existe",
-            )
-
-            return jsonable_encoder(response_schema)
+            raise HTTPException(status_code=404, detail="El usuario no existe")
 
         if (
             verify_password(
@@ -65,16 +56,15 @@ class UserService:
             )
             == False
         ):
-            response_schema = FormatResponseSchema(
-                data=None,
-                message="El password es incorrecto",
-            )
+            raise HTTPException(status_code=404, detail="El password es incorrecto")
 
-            return jsonable_encoder(response_schema)
-
+        accecs_token_expires = timedelta(minutes=settings.access_token_expire_minutes)
         user_schema_response = GetJWTAuthSchema(
             user=jsonable_encoder(user),
-            access_token=create_token({"user_id": str(user.id)}),
+            access_token=create_token(
+                {"user_id": str(user.id)},
+                expires_delta=accecs_token_expires,
+            ),
         )
 
         response_schema = FormatResponseSchema(
