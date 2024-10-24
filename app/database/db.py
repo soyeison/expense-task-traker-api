@@ -19,6 +19,8 @@ def get_db():
 
 def init_db():
     from app.database.models.user_model import UserModel
+    from app.database.models.category_model import CategoryModel
+    from app.database.models.expense_model import ExpenseModel
 
     # Crear las tablas de la base de datos
     Base.metadata.create_all(bind=engine)

@@ -1,5 +1,6 @@
 from datetime import datetime, timezone
 from sqlalchemy import Column, Integer, String, DateTime
+from sqlalchemy.orm import relationship
 from app.database.db import Base
 
 
@@ -13,3 +14,5 @@ class UserModel(Base):
     last_name = Column(String)
     created_at = Column(DateTime, default=datetime.now(timezone.utc))
     updated_at = Column(DateTime, default=datetime.now(timezone.utc))
+
+    expenses = relationship("ExpenseModel", back_populates="user", uselist=False)
