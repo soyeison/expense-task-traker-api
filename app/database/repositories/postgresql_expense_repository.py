@@ -16,3 +16,10 @@ class PostgreSqlExpenseRepository:
         self.db.commit()
         self.db.refresh(db_expense)
         return db_expense
+
+    def get_by_id(self, expense_id: int):
+        db_expense = (
+            self.db.query(ExpenseModel).filter(ExpenseModel.id == expense_id).first()
+        )
+
+        return db_expense

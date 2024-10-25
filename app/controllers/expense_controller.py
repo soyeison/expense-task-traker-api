@@ -15,9 +15,11 @@ class ExpenseController:
 
     def _add_routes(self):
         self.router.get("/", response_model=FormatResponseSchema)(self.get_all)
-        self.router.get("/{expense_id}", response_model=FormatResponseSchema)(
-            self.get_by_id
-        )
+        self.router.get(
+            "/{expense_id}",
+            response_model=FormatResponseSchema,
+            dependencies=[Depends(get_current_user)],
+        )(self.get_by_id)
         self.router.post(
             "/",
             response_model=FormatResponseSchema,
@@ -27,8 +29,12 @@ class ExpenseController:
     async def get_all(self):
         pass
 
-    async def get_by_id(self):
-        pass
+    async def get_by_id(
+        self, expense_id: int, expense_service: ExpenseService = Depends(ExpenseService)
+    ):
+        response = expense_service.get_by_id(expense_id=expense_id)
+
+        return JSONResponse(content=response, status_code=200)
 
     async def create(
         self,

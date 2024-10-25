@@ -32,3 +32,15 @@ class ExpenseService:
         )
 
         return jsonable_encoder(response_schema)
+
+    def get_by_id(self, expense_id: int):
+        db_expense = self.expense_repo.get_by_id(expense_id=expense_id)
+
+        expense_response_schema = ExpenseSchema(**db_expense.__dict__)
+
+        response_schema = FormatResponseSchema(
+            data=jsonable_encoder(expense_response_schema),
+            message="Correctly obtained expense",
+        )
+
+        return jsonable_encoder(response_schema)
