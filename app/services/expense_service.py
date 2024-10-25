@@ -4,6 +4,7 @@ from app.schemas.expense_schema import (
     ExpenseCreateSchema,
     ExpenseSchemaBase,
     ExpenseSchema,
+    ExpenseUpdateSchema,
 )
 from app.schemas.base_schema import FormatResponseSchema
 from app.database.repositories.postgresql_expense_repository import (
@@ -41,6 +42,32 @@ class ExpenseService:
         response_schema = FormatResponseSchema(
             data=jsonable_encoder(expense_response_schema),
             message="Correctly obtained expense",
+        )
+
+        return jsonable_encoder(response_schema)
+
+    def update_expense(self, expense_id: int, expense: ExpenseUpdateSchema):
+        db_expense = self.expense_repo.update_expense(
+            expense_id=expense_id, expense=expense
+        )
+
+        expense_response_schema = ExpenseSchema(**db_expense.__dict__)
+
+        response_schema = FormatResponseSchema(
+            data=jsonable_encoder(expense_response_schema),
+            message="Correctly updated expense",
+        )
+
+        return jsonable_encoder(response_schema)
+
+    def deelete_expense(self, expense_id: int):
+        db_expense = self.expense_repo.delete_expense(expense_id=expense_id)
+
+        expense_response_schema = ExpenseSchema(**db_expense.__dict__)
+
+        response_schema = FormatResponseSchema(
+            data=jsonable_encoder(expense_response_schema),
+            message="Correctly deleted expense",
         )
 
         return jsonable_encoder(response_schema)

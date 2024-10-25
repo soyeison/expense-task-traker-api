@@ -27,3 +27,9 @@ class ExpenseCreateSchema(BaseModel):
 
     class ConfigDict:
         orm_mode = True
+
+
+class ExpenseUpdateSchema(ExpenseCreateSchema):
+    description: Union[str, None] = None
+    amount: Union[float, None] = None
+    category_id: Union[int, None] = None

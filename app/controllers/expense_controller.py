@@ -3,6 +3,7 @@ from fastapi.responses import JSONResponse
 from typing import Annotated
 from app.services.expense_service import ExpenseService
 from app.schemas.expense_schema import ExpenseCreateSchema
+from app.schemas.expense_schema import ExpenseUpdateSchema
 from app.schemas.base_schema import FormatResponseSchema
 from app.utils.auth.jwt import get_current_user
 from app.database.models.user_model import UserModel
@@ -25,6 +26,16 @@ class ExpenseController:
             response_model=FormatResponseSchema,
             dependencies=[Depends(get_current_user)],
         )(self.create)
+        self.router.put(
+            "/{expense_id}",
+            response_model=FormatResponseSchema,
+            dependencies=[Depends(get_current_user)],
+        )(self.update_expense)
+        self.router.delete(
+            "/{expense_id}",
+            response_model=FormatResponseSchema,
+            dependencies=[Depends(get_current_user)],
+        )(self.delete_expense)
 
     async def get_all(self):
         pass
@@ -47,3 +58,22 @@ class ExpenseController:
         )
 
         return JSONResponse(content=response, status_code=201)
+
+    async def update_expense(
+        self,
+        expense_id: int,
+        expense: ExpenseUpdateSchema,
+        expense_service: ExpenseService = Depends(ExpenseService),
+    ):
+        response = expense_service.update_expense(
+            expense_id=expense_id, expense=expense
+        )
+
+        return JSONResponse(content=response, status_code=200)
+
+    async def delete_expense(
+        self, expense_id: int, expense_service: ExpenseService = Depends(ExpenseService)
+    ):
+        response = expense_service.deelete_expense(expense_id=expense_id)
+
+        return JSONResponse(content=response, status_code=200)
