@@ -27,7 +27,7 @@ def create_token(data: dict, expires_delta: timedelta | None = None):
 
 def validate_token(token: str) -> dict:
     try:
-        data = jwt.decode(token, key="misecret", algorithms=["HS256"])
+        data = jwt.decode(token, key=settings.jwt_private_key, algorithms=["HS256"])
         return data
     except InvalidTokenError:
         raise HTTPException(status_code=403, detail="El token ingresado es invalido")
@@ -52,7 +52,7 @@ async def get_current_user(
     user_repo: PostgreSqlUserRepository = Depends(PostgreSqlUserRepository),
 ):
     # Consultar el usuario
-    user = user_repo.get_user_by_id(user_id=UUID(user_information["user_id"]))
+    user = user_repo.get_user_by_id(user_id=user_information["user_id"])
     if user is None:
         HTTPException(status_code=401, detail="El usuario no existe")
     return user

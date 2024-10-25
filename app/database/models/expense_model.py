@@ -15,5 +15,5 @@ class ExpenseModel(Base):
     created_at = Column(DateTime, default=datetime.now(timezone.utc))
     updated_at = Column(DateTime, default=datetime.now(timezone.utc))
 
-    user = relationship("UserModel", back_populates="expense", uselist=False)
+    user = relationship("UserModel", back_populates="expenses", uselist=False)
     category = relationship("CategoryModel", back_populates="expenses", uselist=False)
